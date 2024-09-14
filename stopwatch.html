@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <link rel="stylesheet" href="stopwatch.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Stopwatch</h1>
+        <div id="display">00:00:00</div>
+        <div class="buttons">
+            <button id="startBtn">Start</button>
+            <button id="lapBtn">Lap</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+        <div class="laps">
+            <h2>Laps</h2>
+            <ul id="lapsList"></ul>
+        </div>
+    </div>
+
+    <script >
+        let startTime, updatedTime, difference, interval;
+let running = false;
+let lapsArray = [];
+
+const display = document.getElementById("display");
+const startBtn = document.getElementById("startBtn");
+const lapBtn = document.getElementById("lapBtn");
+const resetBtn = document.getElementById("resetBtn");
+const lapsList = document.getElementById("lapsList");
+
+startBtn.addEventListener("click", function () {
+    if (!running) {
+        startTime = new Date().getTime() - (difference || 0);
+        interval = setInterval(updateTimer, 1000 / 60); // Updates every 60th of a second
+        running = true;
+        startBtn.innerText = "Stop";
+    } else {
+        clearInterval(interval);
+        running = false;
+        startBtn.innerText = "Start";
+    }
+});
+
+lapBtn.addEventListener("click", function () {
+    if (running) {
+        const lapTime = formatTime(difference);
+        lapsArray.push(lapTime);
+        displayLaps();
+    }
+});
+
+resetBtn.addEventListener("click", function () {
+    clearInterval(interval);
+    running = false;
+    difference = 0;
+    startBtn.innerText = "Start";
+    display.innerText = "00:00:00";
+    lapsArray = [];
+    lapsList.innerHTML = "";
+});
+
+function updateTimer() {
+    updatedTime = new Date().getTime();
+    difference = updatedTime - startTime;
+    display.innerText = formatTime(difference);
+}
+
+function formatTime(timeInMilliseconds) {
+    const hours = Math.floor(timeInMilliseconds / (1000 * 60 * 60));
+    const minutes = Math.floor((timeInMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeInMilliseconds % (1000 * 60)) / 1000);
+
+    return (
+        (hours < 10 ? "0" + hours : hours) +
+        ":" +
+        (minutes < 10 ? "0" + minutes : minutes) +
+        ":" +
+        (seconds < 10 ? "0" + seconds : seconds)
+    );
+}
+
+function displayLaps() {
+    lapsList.innerHTML = lapsArray
+        .map((lap, index) => `<li>Lap ${index + 1}: ${lap}</li>`)
+        .join("");
+}
+
+    </script>
+</body>
+</html>
